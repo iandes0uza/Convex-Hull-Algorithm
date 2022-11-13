@@ -161,114 +161,65 @@ def turn( a, b, c ):
 # Build a convex hull from a set of point
 #
 # Use the method described in class
+def Left_index(points):
+    
+    minn = 0
+    for i in range(1,len(points)):
+        if points[i].x < points[minn].x:
+            minn = i
+        elif points[i].x == points[minn].x:
+            if points[i].y > points[minn].y:
+                minn = i
+    return minn
 
+def orientation(p, q, r):
+
+    val = (q.y - p.y) * (r.x - q.x) - \
+          (q.x - p.x) * (r.y - q.y)
+ 
+    if val == 0:
+        return 0
+    elif val > 0:
+        return 1
+    else:
+        return 2
 
 def buildHull( points ):
 
+    n = len(points)     
+    # There must be at least 3 points
+    if n < 3:
+        return
+ 
+    # Find the leftmost point
+    l = Left_index(points)
+ 
     hull = []
-    sortedPoints = points.sort(points, key=lambda p: (p.x,p.y))
-    sPoint1 = sortedPoints[0]
-    sPoint2 = sortedPoints[-1]
+    p = l
+    q = 0
+    while(True):
+         
+        # Add current point to result
+        hull.append(p)
+ 
+        q = (p + 1) % n
+ 
+        for i in range(n):
+            if(orientation(points[p],
+                           points[i], points[q]) == 2):
+                q = i
+                # drawArrow(points[q].x, points[q].y, points[i].x, points[i].y)
+                # points[q].drawPoint()
 
-    hull += [sPoint1, sPoint2]
-
-    sortedPoints.pop(0)
-    sortedPoints.pop(-1)
-
-    aboveSplit, belowSplit = splitSet(sPoint1, sPoint2, sortedPoints)
-
-    hull += segmentedHull(sPoint1, sPoint2, aboveSplit, True) # For segments above, flag is TRUE
-    hull += segmentedHull(sPoint1, sPoint2, belowSplit, False) # For segments below, flag is FALSE
-
+        p = q
+ 
+        # While we don't come to first point
+        if(p == 1):
+            break
+    
+    for each in hull:
+        print(points[each].x, points[each].y)
     display()
-
-
-def segmentedHull(sPoint1, sPoint2, seg, f):
-
-    #Sets initial variables for next portion of hull
-    hull = []
-    p_dist = -1
-    p = None
-
-    for x in seg:
-        # Measures points, furthest one is saved for use
-        dist = measureDist(sPoint1, sPoint2, x)
-        if p_dist < dist:
-            p_dist = dist
-            p = x
-
-    hull += p
-
-    # Remove point from segment, no need checking it twice
-    seg.remove(p)
-
-    abovePoint1, belowPoint1 = splitSet(sPoint1, p_dist, seg)
-    abovePoint2, belowPoint2 = splitSet(sPoint2, p_dist, seg)
-
-    if f == True:
-        hull += segmentedHull(sPoint1, p_dist, abovePoint1, True) + segmentedHull(p_dist, sPoint2, abovePoint2, True)
-    else:
-        hull += segmentedHull(sPoint1, p_dist, belowPoint1, True) + segmentedHull(p_dist, sPoint2, belowPoint2, True)
-
-    return hull
-
-def splitSet(sPoint1, sPoint2, points):
-
-    above = []
-    below = []
-
-    slope = ((sPoint2[1] - sPoint1[1])/(sPoint2[0] - sPoint1[0]))
-    intercept = sPoint1[1] + (sPoint1[0] * -slope)
-
-    for x in points:
-        if x[1] > (slope * x[0] + intercept):
-            above.append(x)
-        elif x[1] < (slope * x[0] + intercept):
-            below.append(x)
-    
-    return above, below
-
-def measureDist(a, b, c):
-    
-    pA = a[1] - b[1]
-    pB = b[0] - a[0]
-    pC = a[0]*b[1] - b[0]*a[1]
-
-    dist = abs((pA*c[0] + pB*c[1] + pC)/(math.sqrt(pA*pA + pB*pB)))
-
-    return dist
-
-
-    # Handle base cases of two or three points
-    #
-    # [YOUR CODE HERE]
-
-    # Handle recursive case.
-    #
-    # After you get the hull-merge working, do the following: For each
-    # point that was removed from the convex hull in a merge, set that
-    # point's CCW and CW pointers to None.  You'll see that the arrows
-    # from interior points disappear after you do this.
-    #
-    # [YOUR CODE HERE]
-
-    # You can do the following to help in debugging.  This highlights
-    # all the points, then shows them, then pauses until you press
-    # 'p'.  While paused, you can click on a point and its coordinates
-    # will be printed in the console window.  If you are using an IDE
-    # in which you can inspect your variables, this will help you to
-    # identify which point on the screen is which point in your data
-    # structure.---------------------------------------------------
-    #
-    # This is good to do, for example, after y-----------------------------------------------------------------------------------------------------------------------------ou have recursively
-    # built two hulls, to see that the two hulls look right.
-    #
-    # This can also be done immediately after you have merged to hulls
-    # ... again, to see that the merged hull looks right.
-    #
-    # Always after you have inspected things, you should remove the
-    # highlighting from the points that you previously highlighted.
-
 
   
 
