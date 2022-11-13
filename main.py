@@ -161,16 +161,16 @@ def turn( a, b, c ):
 # Build a convex hull from a set of point
 #
 # Use the method described in class
-def Left_index(points):
+# def Left_index(points):
     
-    minn = 0
-    for i in range(1,len(points)):
-        if points[i].x < points[minn].x:
-            minn = i
-        elif points[i].x == points[minn].x:
-            if points[i].y > points[minn].y:
-                minn = i
-    return minn
+#     minn = 0
+#     for i in range(1,len(points)):
+#         if points[i].x < points[minn].x:
+#             minn = i
+#         elif points[i].x == points[minn].x:
+#             if points[i].y > points[minn].y:
+#                 minn = i
+#     return minn
 
 def orientation(p, q, r):
 
@@ -188,37 +188,28 @@ def buildHull( points ):
 
     n = len(points)     
     # There must be at least 3 points
-    if n < 3:
+    if (n == 3):
+        points[0].ccwPoint = points[1]
+        points[1].ccwPoint = points[2]
+        points[2].ccwPoint = points[0]
+        points[0].cwPoint = points[2]
+        points[2].cwPoint = points[1]
+        points[1].cwPoint = points[0]
+        return  
+    if (n == 2):
+        points[0].ccwPoint = points[1]
+        points[1].ccwPoint = points[0]
+        points[0].cwPoint = points[1]
+        points[1].cwPoint = points[0]
         return
- 
-    # Find the leftmost point
-    l = Left_index(points)
- 
-    hull = []
-    p = l
-    q = 0
-    while(True):
-         
-        # Add current point to result
-        hull.append(p)
- 
-        q = (p + 1) % n
- 
-        for i in range(n):
-            if(orientation(points[p],
-                           points[i], points[q]) == 2):
-                q = i
-                # drawArrow(points[q].x, points[q].y, points[i].x, points[i].y)
-                points[q].highlight = True
 
-        p = q
- 
-        # While we don't come to first point
-        if(p == 1):
-            break
-    
-    for each in hull:
-        print(points[each].x, points[each].y)
+
+    leftPoints = points[:len(points)//2]
+    rightPoints = points[len(points)//2:]
+
+    buildHull(leftPoints)
+    buildHull(rightPoints)
+
     display()
 
   
