@@ -161,33 +161,16 @@ def turn( a, b, c ):
 # Build a convex hull from a set of point
 #
 # Use the method described in class
-# def Left_index(points):
-    
-#     minn = 0
-#     for i in range(1,len(points)):
-#         if points[i].x < points[minn].x:
-#             minn = i
-#         elif points[i].x == points[minn].x:
-#             if points[i].y > points[minn].y:
-#                 minn = i
-#     return minn
-
-def orientation(p, q, r):
-
-    val = (q.y - p.y) * (r.x - q.x) - \
-          (q.x - p.x) * (r.y - q.y)
- 
-    if val == 0:
-        return 0
-    elif val > 0:
-        return 1
-    else:
-        return 2
 
 def buildHull( points ):
 
+    # def walkingUpwards(left, right):
+    #     while[turn(ccw(left), left, right) == LEFT]or[]
+
+    # saved the length on the working points array
     n = len(points)     
-    # There must be at least 3 points
+
+    # Base case for 3 or 2 points in the array
     if (n == 3):
         points[0].ccwPoint = points[1]
         points[1].ccwPoint = points[2]
