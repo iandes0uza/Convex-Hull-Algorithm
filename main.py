@@ -209,7 +209,7 @@ def buildHull( points ):
                            points[i], points[q]) == 2):
                 q = i
                 # drawArrow(points[q].x, points[q].y, points[i].x, points[i].y)
-                # points[q].drawPoint()
+                points[q].highlight = True
 
         p = q
  
