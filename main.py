@@ -164,13 +164,11 @@ def turn( a, b, c ):
 
 def buildHull( points ):
 
-    # def walkingUpwards(left, right):
-    #     while[turn(ccw(left), left, right) == LEFT]or[]
-
+        
     # saved the length on the working points array
-    n = len(points)     
+    n = len(points)
 
-    # Base case for 3 or 2 points in the array
+        # Base case for 3 or 2 points in the array
     if (n == 3):
         points[0].ccwPoint = points[1]
         points[1].ccwPoint = points[2]
@@ -186,15 +184,44 @@ def buildHull( points ):
         points[1].cwPoint = points[0]
         return
 
+    def walkUp(l, r):
+        while turn(l.ccwPoint, l, r) == LEFT_TURN or turn(l, r, r.cwPoint) == LEFT_TURN:
+            if turn(l.ccwPoint, l, r) == LEFT_TURN:
+                l = l.ccwPoint
+            else:
+                r = r.cwPoint
+        l.cwPoint = r
+        r.ccwPoint = l
+
+    def walkDown(l, r):
+        while turn(l.ccwPoint, l, r) == RIGHT_TURN or turn(l, r, r.cwPoint) == RIGHT_TURN:
+            if turn(l.ccwPoint, l, r) == RIGHT_TURN:
+                l = l.ccwPoint
+            else:
+                r = r.cwPoint
+        r.cwPoint = l
+        l.ccwPoint = r
+
+    def merge(l, r):
+        lPoint = l[0]
+        rPoint = r[0]
+        for currPoint in l:
+            if currPoint.x > lPoint.x:
+                lPoint = currPoint
+        for currPoint in r:
+            if currPoint.x < rPoint.x:
+                rPoint = currPoint
+        walkUp(lPoint, rPoint)
+        walkDown(lPoint, rPoint)
 
     leftPoints = points[:len(points)//2]
     rightPoints = points[len(points)//2:]
 
     buildHull(leftPoints)
     buildHull(rightPoints)
+    merge(leftPoints, rightPoints)
 
     display()
-
   
 
 windowLeft   = None
