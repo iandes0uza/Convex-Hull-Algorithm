@@ -164,45 +164,23 @@ def turn( a, b, c ):
 
 def buildHull( points ):
 
-        
-    # saved the length on the working points array
-    n = len(points)
-
-        # Base case for 3 or 2 points in the array
-    if (n == 3):
-        points[0].ccwPoint = points[1]
-        points[1].ccwPoint = points[2]
-        points[2].ccwPoint = points[0]
-        points[0].cwPoint = points[2]
-        points[2].cwPoint = points[1]
-        points[1].cwPoint = points[0]
-        return  
-    if (n == 2):
-        points[0].ccwPoint = points[1]
-        points[1].ccwPoint = points[0]
-        points[0].cwPoint = points[1]
-        points[1].cwPoint = points[0]
-        return
-
     def walkUp(l, r):
         while turn(l.ccwPoint, l, r) == LEFT_TURN or turn(l, r, r.cwPoint) == LEFT_TURN:
             if turn(l.ccwPoint, l, r) == LEFT_TURN:
                 l = l.ccwPoint
             else:
                 r = r.cwPoint
-        l.cwPoint = r
-        r.ccwPoint = l
-
+        return [l, r]
+    
     def walkDown(l, r):
-        while turn(l.ccwPoint, l, r) == RIGHT_TURN or turn(l, r, r.cwPoint) == RIGHT_TURN:
-            if turn(l.ccwPoint, l, r) == RIGHT_TURN:
-                l = l.ccwPoint
+        while turn(l.cwPoint, l, r) == RIGHT_TURN or turn(l, r, r.ccwPoint) == RIGHT_TURN:
+            if turn(l.cwPoint, l, r) == RIGHT_TURN:
+                l = l.cwPoint
             else:
-                r = r.cwPoint
-        r.cwPoint = l
-        l.ccwPoint = r
-
-    def merge(l, r):
+                r = r.ccwPoint
+        return [l, r]
+        
+    def merge(l, r): 
         lPoint = l[0]
         rPoint = r[0]
         for currPoint in l:
@@ -211,9 +189,52 @@ def buildHull( points ):
         for currPoint in r:
             if currPoint.x < rPoint.x:
                 rPoint = currPoint
-        walkUp(lPoint, rPoint)
-        walkDown(lPoint, rPoint)
+        #Merge parts of hull
+        leftHull = walkUp(lPoint,rPoint)
+        rightHull = walkDown(lPoint,rPoint)
+        leftHull[0].cwPoint = leftHull[1]
+        leftHull[1].ccwPoint = leftHull[0]
+        rightHull[0].ccwPoint = rightHull[1]
+        rightHull[1].cwPoint = rightHull[0]
+        #Remove parts not in hull
+        discardPile = []
+        currPoint = leftHull[0].cwPoint
+        while currPoint not in discardPile:
+            discardPile.append(currPoint)
+            currPoint = currPoint.cwPoint
+        for currPoint in (l+r):
+            if currPoint not in (discardPile):
+                currPoint.cwPoint = None
+                currPoint.ccwPoint = None
 
+        
+    # saved the length on the working points array
+    n = len(points)
+
+        # Base case for 3 or 2 points in the array
+    if (n == 2):
+        points[0].cwPoint = points[1]
+        points[0].ccwPoint = points[1]
+        points[1].cwPoint = points[0]
+        points[1].ccwPoint = points[0]
+        return points
+    elif (n == 3):
+        if turn(points[0],points[1],points[2]) == RIGHT_TURN:
+            points[0].cwPoint = points[1]
+            points[1].cwPoint = points[2]
+            points[2].cwPoint = points[0]
+            points[0].ccwPoint = points[2]
+            points[2].ccwPoint = points[1]
+            points[1].ccwPoint = points[0]
+        else:
+            points[0].ccwPoint = points[1]
+            points[1].ccwPoint = points[2]
+            points[2].ccwPoint = points[0]
+            points[0].cwPoint = points[2]
+            points[2].cwPoint = points[1]
+            points[1].cwPoint = points[0]
+        return points
+    
     leftPoints = points[:len(points)//2]
     rightPoints = points[len(points)//2:]
 
