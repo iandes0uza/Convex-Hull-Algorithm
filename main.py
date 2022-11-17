@@ -164,7 +164,8 @@ def turn( a, b, c ):
 
 def buildHull( points ):
 
-    def walkUp(l, r):
+    #Walking up algo from slides
+    def walkingUpwards(l, r):
         while turn(l.ccwPoint, l, r) == LEFT_TURN or turn(l, r, r.cwPoint) == LEFT_TURN:
             if turn(l.ccwPoint, l, r) == LEFT_TURN:
                 l = l.ccwPoint
@@ -172,7 +173,8 @@ def buildHull( points ):
                 r = r.cwPoint
         return [l, r]
     
-    def walkDown(l, r):
+    #Using intuition, reversed the walkUp up algo from slides
+    def walkingDownwards(l, r):
         while turn(l.cwPoint, l, r) == RIGHT_TURN or turn(l, r, r.ccwPoint) == RIGHT_TURN:
             if turn(l.cwPoint, l, r) == RIGHT_TURN:
                 l = l.cwPoint
@@ -183,20 +185,26 @@ def buildHull( points ):
     def merge(l, r): 
         lPoint = l[0]
         rPoint = r[0]
+
+        #These two for loops find the furthest left and right points in both halves
         for currPoint in l:
             if currPoint.x > lPoint.x:
                 lPoint = currPoint
         for currPoint in r:
             if currPoint.x < rPoint.x:
                 rPoint = currPoint
-        #Merge parts of hull
-        leftHull = walkUp(lPoint,rPoint)
-        rightHull = walkDown(lPoint,rPoint)
+    
+        #Recursively merge both left and right half of hulls
+        leftHull = walkingUpwards(lPoint,rPoint)
+        rightHull = walkingDownwards(lPoint,rPoint)
+
+        #Essentially the base case to resolve recursion once leftmost and rightmost points upper points are determined
         leftHull[0].cwPoint = leftHull[1]
         rightHull[1].cwPoint = rightHull[0]
         leftHull[1].ccwPoint = leftHull[0]
         rightHull[0].ccwPoint = rightHull[1]
-        #Remove parts not in hull
+
+        #This section finds all the points not in the convex hull and removes their cw/ccw pointers & highlight
         discardPile = []
         currPoint = leftHull[0].cwPoint
         while currPoint not in discardPile:
@@ -206,17 +214,20 @@ def buildHull( points ):
             if currPoint not in (discardPile):
                 currPoint.cwPoint = None
                 currPoint.ccwPoint = None
+                currPoint.highlight = False 
 
         
-    # saved the length on the working points array
+    #saved the length on the working points array
     n = len(points)
 
-        # Base case for 3 or 2 points in the array
+    #Base case for 3 or 2 points in the array, highlights points used to create initial loops (removed when recursively dumped from hull)
     if (n == 2):
         points[0].cwPoint = points[1]
         points[0].ccwPoint = points[1]
         points[1].cwPoint = points[0]
         points[1].ccwPoint = points[0]
+        points[0].highlight = True
+        points[1].highlight = True
         return points
     elif (n == 3):
         if turn(points[0],points[1],points[2]) == RIGHT_TURN:
@@ -233,10 +244,13 @@ def buildHull( points ):
             points[0].cwPoint = points[2]
             points[2].cwPoint = points[1]
             points[1].cwPoint = points[0]
+        points[0].highlight = True
+        points[1].highlight = True
+        points[2].highlight = True
         return points
     
-    leftPoints = points[:len(points)//2]
-    rightPoints = points[len(points)//2:]
+    leftPoints = points[:len(points)//2] #left half
+    rightPoints = points[len(points)//2:] #right half
 
     buildHull(leftPoints)
     buildHull(rightPoints)
