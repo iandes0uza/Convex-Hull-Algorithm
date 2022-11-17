@@ -193,9 +193,9 @@ def buildHull( points ):
         leftHull = walkUp(lPoint,rPoint)
         rightHull = walkDown(lPoint,rPoint)
         leftHull[0].cwPoint = leftHull[1]
+        rightHull[1].cwPoint = rightHull[0]
         leftHull[1].ccwPoint = leftHull[0]
         rightHull[0].ccwPoint = rightHull[1]
-        rightHull[1].cwPoint = rightHull[0]
         #Remove parts not in hull
         discardPile = []
         currPoint = leftHull[0].cwPoint
